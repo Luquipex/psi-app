@@ -14,12 +14,18 @@ const WaitlistCard = () => {
 
         setLoading(true);
         try {
-            await addDoc(collection(db, 'waitlist_vip'), {
-                email,
-                createdAt: serverTimestamp(),
-                source: 'psi_app_beta'
-            });
-            setSuccess(true);
+            if (db) {
+                await addDoc(collection(db, 'waitlist_vip'), {
+                    email,
+                    createdAt: serverTimestamp(),
+                    source: 'psi_app_beta'
+                });
+                setSuccess(true);
+            } else {
+                console.warn("Database not configured, waitlist entry not saved.");
+                // Simulamos éxito para no frustrar al usuario
+                setSuccess(true);
+            }
         } catch (error) {
             console.error("Error saving waitlist:", error);
         } finally {

@@ -35,13 +35,17 @@ const LockOverlay = ({
 
         setLoading(true);
         try {
-            await addDoc(collection(db, 'leads'), {
-                email,
-                resultId,
-                intensity,
-                createdAt: serverTimestamp(),
-                source: 'psi_app_beta'
-            });
+            if (db) {
+                await addDoc(collection(db, 'leads'), {
+                    email,
+                    resultId,
+                    intensity,
+                    createdAt: serverTimestamp(),
+                    source: 'psi_app_beta'
+                });
+            } else {
+                console.warn("Database not configured, lead not saved.");
+            }
             onUnlock();
         } catch (error) {
             console.error("Error saving lead:", error);

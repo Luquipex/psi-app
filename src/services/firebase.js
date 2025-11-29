@@ -14,9 +14,23 @@ const firebaseConfig = {
 };
 
 // Inicialización segura (evita errores si no hay config en desarrollo)
-const app = initializeApp(Object.values(firebaseConfig).every(Boolean) ? firebaseConfig : {});
+let app;
+let auth;
+let db;
 
-export const auth = getAuth(app);
-export const db = getFirestore(app);
+const isConfigValid = Object.values(firebaseConfig).every(value => value !== undefined && value !== '');
 
+if (isConfigValid) {
+    try {
+        app = initializeApp(firebaseConfig);
+        auth = getAuth(app);
+        db = getFirestore(app);
+    } catch (error) {
+        console.error("Firebase initialization error:", error);
+    }
+} else {
+    console.warn("Firebase config missing. Features requiring database will be disabled.");
+}
+
+export { auth, db };
 export default app;

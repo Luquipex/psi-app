@@ -1,12 +1,20 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, User } from 'lucide-react';
 import Layout from '../components/layout/Layout';
 import { useDiagnostic } from '../hooks/useDiagnostic';
+import { useAuth } from '../hooks/useAuth';
 
 const LandingPage = () => {
     const navigate = useNavigate();
     const { resetDiagnostic } = useDiagnostic();
+    const { user } = useAuth();
+
+    useEffect(() => {
+        if (user) {
+            navigate('/dashboard');
+        }
+    }, [user, navigate]);
 
     const handleStart = () => {
         resetDiagnostic();
@@ -15,6 +23,16 @@ const LandingPage = () => {
 
     return (
         <Layout>
+            {/* Header con Login */}
+            <div className="absolute top-4 right-6 z-20">
+                <button
+                    onClick={() => navigate('/login')}
+                    className="text-sm font-bold text-text-primary hover:text-brand-primary flex items-center gap-2 bg-white/50 backdrop-blur px-4 py-2 rounded-full border border-ui-secondary/10 shadow-warm-sm transition-all hover:bg-white"
+                >
+                    <User size={16} /> Ingresar
+                </button>
+            </div>
+
             <div className="flex-1 flex flex-col items-center justify-center p-6 text-center min-h-[80vh]">
                 <h1 className="text-hero text-text-primary mb-6 leading-tight">
                     Convertite en tu{' '}

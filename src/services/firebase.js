@@ -1,19 +1,16 @@
 import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
+import {
+    getAuth,
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    signOut,
+    onAuthStateChanged
+} from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
-// Configuración usando variables de entorno de Vite
-// El usuario debe crear un archivo .env.local con estas variables
-const firebaseConfig = {
-    apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-    storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-    messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-    appId: import.meta.env.VITE_FIREBASE_APP_ID
-};
+// ... (configuración existente)
 
-// Inicialización segura (evita errores si no hay config en desarrollo)
+// Inicialización segura
 let app;
 let auth;
 let db;
@@ -32,5 +29,12 @@ if (isConfigValid) {
     console.warn("Firebase config missing. Features requiring database will be disabled.");
 }
 
-export { auth, db };
+export {
+    auth,
+    db,
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    signOut,
+    onAuthStateChanged
+};
 export default app;

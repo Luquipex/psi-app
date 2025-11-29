@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Lock, Phone, AlertTriangle } from 'lucide-react';
-import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
-import { db } from '../../services/firebase';
+import { Lock, Phone, AlertTriangle, Eye, EyeOff } from 'lucide-react';
+import { useAuth } from '../../hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
 
 const LockOverlay = ({
     intensity,
@@ -10,46 +10,60 @@ const LockOverlay = ({
     onUnlock
 }) => {
     const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
+
+    const { signup } = useAuth();
+    const navigate = useNavigate();
 
     // Lógica de textos según intensidad
     let overlayTitle = "";
-    let submitButtonText = "Enviar y Desbloquear";
+    let submitButtonText = "Crear Cuenta y Ver Resultados";
     let showSupportCTA = false;
 
     if (intensity === 'friction') {
-        overlayTitle = "Desbloquea la Explicación Neurocientífica";
-        submitButtonText = "Enviar y Desbloquear la Ciencia";
+        overlayTitle = "Crea tu cuenta gratis para ver tu explicación neurocientífica";
     } else if (intensity === 'loss') {
-        overlayTitle = `Desbloquea tu Diagnóstico y la Herramienta: "${toolName}"`;
-        submitButtonText = "Enviar y Desbloquear la Herramienta";
+        overlayTitle = `Regístrate para guardar tu herramienta: "${toolName}"`;
     } else if (intensity === 'health') {
-        overlayTitle = "Obtén la Guía Completa de tu Perfil";
-        submitButtonText = "Enviar y Desbloquear la Guía";
+        overlayTitle = "Guarda tu perfil completo creando una cuenta";
         showSupportCTA = true;
     }
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!email) return;
+        if (!email || !password) return;
+        if (password.length < 6) {
+            setError("La contraseña debe tener al menos 6 caracteres");
+            return;
+        }
 
         setLoading(true);
+        setError('');
+
         try {
-            if (db) {
-                await addDoc(collection(db, 'leads'), {
-                    email,
-                    resultId,
-                    intensity,
-                    createdAt: serverTimestamp(),
-                    source: 'psi_app_beta'
-                });
-            } else {
-                console.warn("Database not configured, lead not saved.");
-            }
+            // Crear usuario y guardar perfil con el resultado del quiz
+            await signup(email, password, {
+                archetypeId: resultId,
+                intensity: intensity,
+                toolName: toolName,
+                source: 'psi_app_beta'
+            });
+
+            // Redirigir al dashboard (o desbloquear si prefieres mantenerlos aquí)
+            // Por ahora desbloqueamos para que vean el resultado inmediato, 
+            // pero ya tienen cuenta para volver.
             onUnlock();
-        } catch (error) {
-            console.error("Error saving lead:", error);
-            onUnlock(); // Fallback
+
+        } catch (err) {
+            console.error("Signup error:", err);
+            if (err.code === 'auth/email-already-in-use') {
+                setError("Este email ya está registrado. Intenta iniciar sesión.");
+            } else {
+                setError("Error al crear cuenta. Intenta nuevamente.");
+            }
         } finally {
             setLoading(false);
         }
@@ -89,7 +103,7 @@ const LockOverlay = ({
             </div>
 
             {/* Overlay con Formulario */}
-            <div className="absolute inset-0 bg-bg-primary/60 backdrop-blur-sm flex flex-col items-center justify-center p-6 text-center">
+            <div className="absolute inset-0 bg-bg-primary/90 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center z-10">
                 <div className="bg-brand-primary/10 p-4 rounded-full mb-4 text-brand-primary shadow-warm">
                     <Lock size={32} />
                 </div>
@@ -97,26 +111,63 @@ const LockOverlay = ({
                     {overlayTitle}
                 </h3>
 
-                <form onSubmit={handleSubmit} className="w-full max-w-sm flex flex-col gap-3 mt-4">
+                <p className="text-sm text-text-secondary mb-6 max-w-xs mx-auto">
+                    Únete a Psi.app para guardar tu progreso y acceder a tu dashboard personal.
+                </p>
+
+                <form onSubmit={handleSubmit} className="w-full max-w-sm flex flex-col gap-3">
+                    {error && (
+                        <div className="text-xs text-red-600 bg-red-50 p-2 rounded border border-red-100">
+                            {error}
+                        </div>
+                    )}
+
                     <input
                         type="email"
                         placeholder="Tu correo electrónico"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="w-full px-4 py-3 border border-ui-secondary/30 rounded-lg focus:ring-2 focus:ring-brand-primary outline-none text-center"
+                        className="w-full px-4 py-3 border border-ui-secondary/30 rounded-lg focus:ring-2 focus:ring-brand-primary outline-none"
                         required
                     />
+
+                    <div className="relative">
+                        <input
+                            type={showPassword ? "text" : "password"}
+                            placeholder="Crea una contraseña"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            className="w-full px-4 py-3 border border-ui-secondary/30 rounded-lg focus:ring-2 focus:ring-brand-primary outline-none"
+                            required
+                            minLength={6}
+                        />
+                        <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-ui-secondary hover:text-text-primary"
+                        >
+                            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                        </button>
+                    </div>
+
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full bg-brand-primary text-white font-bold py-3 rounded-lg hover:bg-brand-hover transition-all shadow-warm-lg flex justify-center items-center gap-2 disabled:opacity-70"
+                        className="w-full bg-brand-primary text-white font-bold py-3 rounded-lg hover:bg-brand-hover transition-all shadow-warm-lg flex justify-center items-center gap-2 disabled:opacity-70 mt-2"
                     >
-                        {loading ? "Procesando..." : submitButtonText}
+                        {loading ? "Creando cuenta..." : submitButtonText}
                     </button>
                 </form>
-                <p className="text-[10px] text-ui-secondary mt-4 uppercase tracking-wide">
-                    100% Seguro & Sin Spam
-                </p>
+
+                <div className="mt-4 text-xs text-text-secondary">
+                    ¿Ya tienes cuenta?{' '}
+                    <button
+                        onClick={() => navigate('/login')}
+                        className="text-brand-primary font-bold hover:underline"
+                    >
+                        Iniciar Sesión
+                    </button>
+                </div>
             </div>
         </div>
     );

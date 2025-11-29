@@ -1,0 +1,52 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Typography Hierarchy - Psi.app */
+@layer base {
+    body {
+        @apply font-body text-text-primary;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        @apply font-display;
+    }
+}
+
+@layer components {
+
+    /* H1 - Hero */
+    .text-hero {
+        @apply font-display font-extrabold text-[32px] md:text-5xl tracking-tighter-custom;
+    }
+
+    /* H2 - Secciones */
+    .text-section {
+        @apply font-display font-bold text-2xl tracking-tighter-custom;
+    }
+
+    /* H3 - Tarjetas/Subtítulos */
+    .text-subtitle {
+        @apply font-display font-bold text-lg tracking-tighter-custom;
+    }
+
+    /* Body - Lectura */
+    .text-body {
+        @apply font-body font-normal text-base leading-relaxed;
+    }
+
+    /* Button Label */
+    .text-button {
+        @apply font-body font-medium text-sm md:text-base tracking-normal;
+    }
+
+    /* Button Label (Uppercase/Small) */
+    .text-button-caps {
+        @apply font-body font-medium text-xs uppercase tracking-wider-custom;
+    }
+}

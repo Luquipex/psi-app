@@ -31,7 +31,7 @@ const LoginPage = () => {
 
     return (
         <Layout>
-            <div className="flex-1 flex flex-col items-center justify-center p-6 w-full max-w-md mx-auto min-h-[60vh]">
+            <div className="flex-1 flex flex-col items-center justify-center p-6 pb-12 w-full max-w-md mx-auto min-h-screen py-10">
                 <h1 className="text-3xl font-bold text-text-primary mb-2 text-center">
                     Bienvenido de nuevo
                 </h1>
@@ -81,7 +81,7 @@ const LoginPage = () => {
                     </button>
                 </form>
 
-                <div className="mt-8 text-center">
+                <div className="mt-6 block text-center">
                     <p className="text-sm text-text-secondary">
                         ¿Aún no tienes cuenta?{' '}
                         <button

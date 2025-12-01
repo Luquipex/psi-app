@@ -103,7 +103,7 @@ const LockOverlay = ({
             </div>
 
             {/* Overlay con Formulario */}
-            <div className="absolute inset-0 bg-bg-primary/90 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center z-10">
+            <div className="absolute inset-0 bg-bg-primary/90 backdrop-blur-md flex flex-col items-center justify-center p-6 pb-12 text-center z-10">
                 <div className="bg-brand-primary/10 p-4 rounded-full mb-4 text-brand-primary shadow-warm">
                     <Lock size={32} />
                 </div>
@@ -159,7 +159,7 @@ const LockOverlay = ({
                     </button>
                 </form>
 
-                <div className="mt-4 text-xs text-text-secondary">
+                <div className="mt-6 block text-xs text-text-secondary">
                     ¿Ya tienes cuenta?{' '}
                     <button
                         onClick={() => navigate('/login')}

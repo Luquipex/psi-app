@@ -47,7 +47,7 @@ const QuizPage = () => {
 
             <div className="flex-1 flex flex-col items-center justify-start pt-12 p-6 w-full">
                 {/* Header con botón de retroceso */}
-                <div className="w-full max-w-2xl flex justify-between items-center mb-6">
+                <div className="w-full max-w-2xl flex justify-between items-center mb-6 mt-6">
                     <button
                         onClick={handleBack}
                         className="flex items-center gap-2 text-ui-secondary hover:text-text-primary transition-colors text-sm font-medium px-3 py-2 rounded-lg hover:bg-white/50"

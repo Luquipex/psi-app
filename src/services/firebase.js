@@ -6,7 +6,7 @@ import {
     signOut,
     onAuthStateChanged
 } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+import { getFirestore, collection, addDoc, serverTimestamp } from "firebase/firestore";
 
 // Configuración usando variables de entorno de Vite
 const firebaseConfig = {
@@ -43,6 +43,9 @@ export {
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
     signOut,
-    onAuthStateChanged
+    onAuthStateChanged,
+    collection,
+    addDoc,
+    serverTimestamp
 };
 export default app;

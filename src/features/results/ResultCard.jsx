@@ -1,16 +1,18 @@
 import React, { useState } from 'react';
-import { Brain, Key, Calendar, MessageCircle } from 'lucide-react';
+import { Brain, Key, Calendar, MessageCircle, HelpCircle } from 'lucide-react';
 import LockOverlay from './LockOverlay';
 import WaitlistCard from './WaitlistCard';
+import FeedbackModal from '../../components/ui/FeedbackModal';
 
 const ResultCard = ({ data, intensity }) => {
     const [isUnlocked, setIsUnlocked] = useState(false);
+    const [showFeedbackModal, setShowFeedbackModal] = useState(false);
 
     const showStepsAlways = intensity === 'friction';
     const isFullyVisible = isUnlocked || showStepsAlways;
 
     const handleShare = () => {
-        const text = `Hice este test de perfiles psicológicos en Psi.app y me salió: ${data.profile.marketing_name}. ¡Hacelo vos también!`;
+        const text = `Descubrí mi arquetipo mental en Psi.app. Haz el test gratuito aquí: www.psiapp.online.com`;
         window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
     };
 
@@ -114,6 +116,25 @@ const ResultCard = ({ data, intensity }) => {
                     <WaitlistCard />
                 </div>
             )}
+
+            {/* 7. Catch-All Feedback Button (Footer) */}
+            <div className="mt-8 pt-6 border-t border-ui-secondary/20 text-center">
+                <button
+                    onClick={() => setShowFeedbackModal(true)}
+                    className="text-sm text-ui-secondary hover:text-brand-primary transition-colors flex items-center gap-2 mx-auto font-medium"
+                >
+                    <HelpCircle size={18} />
+                    ¿No te sientes identificado con este perfil?
+                </button>
+            </div>
+
+            {/* Feedback Modal */}
+            <FeedbackModal
+                isOpen={showFeedbackModal}
+                onClose={() => setShowFeedbackModal(false)}
+                archetypeId={data.id}
+                intensity={intensity}
+            />
         </div>
     );
 };

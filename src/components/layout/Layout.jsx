@@ -16,7 +16,7 @@ const Layout = ({ children, showHeader = true }) => {
                     </div>
                 </header>
             )}
-            <main className="flex-1 flex flex-col w-full max-w-4xl mx-auto">
+            <main className="flex-1 flex flex-col w-full max-w-4xl mx-auto overflow-y-auto pb-12">
                 {children}
             </main>
         </div>

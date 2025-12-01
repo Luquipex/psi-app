@@ -86,8 +86,8 @@ const LockOverlay = ({
                 </div>
             )}
 
-            {/* Contenido "Fake" de fondo borroso */}
-            <div className="bg-bg-primary p-6 min-h-[400px] filter blur-sm select-none opacity-50 pointer-events-none">
+            {/* Contenido "Fake" de fondo borroso - Ahora Absolute */}
+            <div className="absolute inset-0 bg-bg-primary p-6 min-h-[400px] filter blur-sm select-none opacity-50 pointer-events-none">
                 <div className="space-y-4">
                     <h3 className="text-2xl font-bold text-text-primary">Protocolo Avanzado</h3>
                     <p className="text-text-secondary">
@@ -102,8 +102,8 @@ const LockOverlay = ({
                 </div>
             </div>
 
-            {/* Overlay con Formulario */}
-            <div className="absolute inset-0 bg-bg-primary/90 backdrop-blur-md flex flex-col items-center justify-center p-6 pb-12 text-center z-10">
+            {/* Overlay con Formulario - Ahora Relative para empujar la altura */}
+            <div className="relative bg-bg-primary/90 backdrop-blur-md flex flex-col items-center justify-center p-6 pb-12 text-center z-10 w-full">
                 <div className="bg-brand-primary/10 p-4 rounded-full mb-4 text-brand-primary shadow-warm">
                     <Lock size={32} />
                 </div>

@@ -1,15 +1,33 @@
 import React, { useState } from 'react';
-import { Brain, Key, Calendar, MessageCircle, HelpCircle } from 'lucide-react';
+import { Brain, Key, Calendar, MessageCircle, HelpCircle, CheckCircle } from 'lucide-react';
 import LockOverlay from './LockOverlay';
 import WaitlistCard from './WaitlistCard';
 import FeedbackModal from '../../components/ui/FeedbackModal';
+import { useAuth } from '../../hooks/useAuth';
 
 const ResultCard = ({ data, intensity }) => {
     const [isUnlocked, setIsUnlocked] = useState(false);
     const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+    const { user, updateUserProfile } = useAuth();
 
     const showStepsAlways = intensity === 'friction';
     const isFullyVisible = isUnlocked || showStepsAlways;
+
+    // Efecto: Si el usuario ya está logueado, guardar resultado y desbloquear
+    React.useEffect(() => {
+        if (user && data) {
+            const saveResult = async () => {
+                await updateUserProfile({
+                    archetypeId: data.id,
+                    intensity: intensity,
+                    toolName: data.content.intervention.tool_name,
+                    lastUpdated: new Date()
+                });
+                setIsUnlocked(true);
+            };
+            saveResult();
+        }
+    }, [user, data, intensity, updateUserProfile]);
 
     const handleShare = () => {
         const text = `Descubrí mi arquetipo mental en Psi.app. Haz el test gratuito aquí: www.psiapp.online.com`;

@@ -55,7 +55,8 @@ const LockOverlay = ({
             // Redirigir al dashboard (o desbloquear si prefieres mantenerlos aquí)
             // Por ahora desbloqueamos para que vean el resultado inmediato, 
             // pero ya tienen cuenta para volver.
-            onUnlock();
+            // Redirigir al dashboard para confirmar la creación de cuenta
+            navigate('/dashboard');
 
         } catch (err) {
             console.error("Signup error:", err);

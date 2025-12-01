@@ -6,7 +6,7 @@ import {
     signOut,
     onAuthStateChanged
 } from 'firebase/auth';
-import { doc, setDoc, getDoc } from 'firebase/firestore';
+import { doc, setDoc, getDoc, updateDoc } from 'firebase/firestore';
 
 const AuthContext = createContext();
 
@@ -73,6 +73,23 @@ export const AuthProvider = ({ children }) => {
         return newUser;
     };
 
+    // Actualizar perfil de usuario existente
+    const updateUserProfile = async (data) => {
+        if (!auth.currentUser || !db) return;
+
+        try {
+            const userRef = doc(db, "users", auth.currentUser.uid);
+            await updateDoc(userRef, data);
+
+            // Actualizar estado local
+            setUserProfile(prev => ({ ...prev, ...data }));
+            return true;
+        } catch (error) {
+            console.error("Error updating user profile:", error);
+            return false;
+        }
+    };
+
     const login = (email, password) => {
         if (!auth) throw new Error("Auth not configured");
         return signInWithEmailAndPassword(auth, email, password);
@@ -87,6 +104,7 @@ export const AuthProvider = ({ children }) => {
         user,
         userProfile,
         signup,
+        updateUserProfile,
         login,
         logout,
         loading

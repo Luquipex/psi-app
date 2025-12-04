@@ -54,20 +54,29 @@ export const AuthProvider = ({ children }) => {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const newUser = userCredential.user;
 
-        // Crear documento de usuario en Firestore
-        try {
-            if (db) {
-                await setDoc(doc(db, "users", newUser.uid), {
+        // Crear documento de usuario en Firestore con timeout
+        if (db) {
+            try {
+                // Agregar timeout a la operación de Firestore
+                const firestoreWrite = setDoc(doc(db, "users", newUser.uid), {
                     email: newUser.email,
                     createdAt: new Date(),
-                    ...additionalData // Aquí guardaremos el arquetipo/resultado
+                    ...additionalData
                 });
-                // Actualizar estado local
+
+                const timeout = new Promise((_, reject) =>
+                    setTimeout(() => reject(new Error("Firestore timeout")), 5000)
+                );
+
+                await Promise.race([firestoreWrite, timeout]);
+
+                // Actualizar estado local solo si la escritura fue exitosa
                 setUserProfile({ email: newUser.email, ...additionalData });
+            } catch (error) {
+                console.error("Error creating user profile:", error);
+                // No bloqueamos el flujo si falla Firestore
+                // El usuario aún está autenticado, solo falta el perfil completo
             }
-        } catch (error) {
-            console.error("Error creating user profile:", error);
-            // No bloqueamos el flujo si falla Firestore, pero logueamos
         }
 
         return newUser;

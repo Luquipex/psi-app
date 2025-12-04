@@ -58,10 +58,13 @@ const LockOverlay = ({
 
         // Safety timeout para evitar hang infinito
         const timeoutId = setTimeout(() => {
-            if (loading) {
-                setLoading(false);
-                setError("La solicitud está tardando demasiado. Verifica tu conexión.");
-            }
+            setLoading((currentLoading) => {
+                if (currentLoading) {
+                    setError("La solicitud está tardando demasiado. Verifica tu conexión.");
+                    return false;
+                }
+                return currentLoading;
+            });
         }, 10000);
 
         try {

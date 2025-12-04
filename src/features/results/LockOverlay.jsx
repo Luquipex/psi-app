@@ -94,16 +94,16 @@ const LockOverlay = ({
     return (
         <div className="relative rounded-2xl overflow-hidden border border-ui-secondary/20 mt-8">
             {showSupportCTA && (
-                <div className="bg-red-50 border-b border-red-100 p-4 flex justify-between items-center">
+                <div className="bg-red-50 border-b border-red-100 p-4 flex justify-between items-center relative z-20">
                     <div className="flex items-center gap-2 text-red-700 font-bold">
                         <AlertTriangle size={20} />
                         <span className="text-sm">Recomendación Prioritaria</span>
                     </div>
                     <button
-                        onClick={() => alert("Por favor contacta a un profesional de salud mental.")}
+                        onClick={() => window.open("https://wa.me/5493764669759?text=Hola,%20acabo%20de%20realizar%20mi%20diagnostico%20en%20Psiapp%20y%20me%20gustaria%20profundizar%20en%20mi%20perfil", "_blank")}
                         className="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg text-xs font-bold flex items-center gap-2"
                     >
-                        <Phone size={14} /> Buscar Soporte
+                        <Phone size={14} /> Habla con un especialista
                     </button>
                 </div>
             )}

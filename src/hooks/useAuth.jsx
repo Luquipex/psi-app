@@ -25,23 +25,39 @@ export const AuthProvider = ({ children }) => {
 
         const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
             setUser(currentUser);
+
             if (currentUser) {
-                // Cargar perfil adicional si existe
-                try {
-                    if (db) {
+                // Primero marcamos como no-loading para permitir al usuario ver el dashboard
+                // El perfil puede cargarse después
+                setLoading(false);
+
+                // Cargar perfil adicional si existe, con timeout
+                if (db) {
+                    try {
                         const docRef = doc(db, "users", currentUser.uid);
-                        const docSnap = await getDoc(docRef);
+
+                        // Timeout para getDoc
+                        const firestoreRead = getDoc(docRef);
+                        const timeout = new Promise((_, reject) =>
+                            setTimeout(() => reject(new Error("Firestore read timeout")), 3000)
+                        );
+
+                        const docSnap = await Promise.race([firestoreRead, timeout]);
+
                         if (docSnap.exists()) {
                             setUserProfile(docSnap.data());
+                        } else {
+                            console.warn("User profile document does not exist yet");
                         }
+                    } catch (error) {
+                        console.error("Error fetching user profile:", error);
+                        // No bloqueamos la UI - el usuario puede seguir usando la app
                     }
-                } catch (error) {
-                    console.error("Error fetching user profile:", error);
                 }
             } else {
                 setUserProfile(null);
+                setLoading(false);
             }
-            setLoading(false);
         });
 
         return () => unsubscribe();

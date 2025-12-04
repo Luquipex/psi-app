@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Lock, Phone, AlertTriangle, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
@@ -14,9 +14,18 @@ const LockOverlay = ({
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const [configError, setConfigError] = useState(false);
 
     const { signup } = useAuth();
     const navigate = useNavigate();
+
+    // Verificar configuración al montar
+    useEffect(() => {
+        if (!import.meta.env.VITE_FIREBASE_API_KEY) {
+            setConfigError(true);
+            setError("Error de configuración: Faltan credenciales de Firebase (.env)");
+        }
+    }, []);
 
     // Lógica de textos según intensidad
     let overlayTitle = "";
@@ -34,6 +43,10 @@ const LockOverlay = ({
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (configError) {
+            setError("No se puede crear cuenta: Falta configuración del sistema.");
+            return;
+        }
         if (!email || !password) return;
         if (password.length < 6) {
             setError("La contraseña debe tener al menos 6 caracteres");
@@ -42,6 +55,14 @@ const LockOverlay = ({
 
         setLoading(true);
         setError('');
+
+        // Safety timeout para evitar hang infinito
+        const timeoutId = setTimeout(() => {
+            if (loading) {
+                setLoading(false);
+                setError("La solicitud está tardando demasiado. Verifica tu conexión.");
+            }
+        }, 10000);
 
         try {
             // Crear usuario y guardar perfil con el resultado del quiz
@@ -52,20 +73,20 @@ const LockOverlay = ({
                 source: 'psi_app_beta'
             });
 
-            // Redirigir al dashboard (o desbloquear si prefieres mantenerlos aquí)
-            // Por ahora desbloqueamos para que vean el resultado inmediato, 
-            // pero ya tienen cuenta para volver.
+            clearTimeout(timeoutId);
             // Redirigir al dashboard para confirmar la creación de cuenta
             navigate('/dashboard');
 
         } catch (err) {
+            clearTimeout(timeoutId);
             console.error("Signup error:", err);
             if (err.code === 'auth/email-already-in-use') {
                 setError("Este email ya está registrado. Intenta iniciar sesión.");
+            } else if (err.message === "Auth not configured") {
+                setError("Error de sistema: Firebase no está configurado.");
             } else {
                 setError("Error al crear cuenta. Intenta nuevamente.");
             }
-        } finally {
             setLoading(false);
         }
     };
@@ -130,6 +151,7 @@ const LockOverlay = ({
                         onChange={(e) => setEmail(e.target.value)}
                         className="w-full px-4 py-3 border border-ui-secondary/30 rounded-lg focus:ring-2 focus:ring-brand-primary outline-none"
                         required
+                        disabled={loading}
                     />
 
                     <div className="relative">
@@ -141,11 +163,13 @@ const LockOverlay = ({
                             className="w-full px-4 py-3 border border-ui-secondary/30 rounded-lg focus:ring-2 focus:ring-brand-primary outline-none"
                             required
                             minLength={6}
+                            disabled={loading}
                         />
                         <button
                             type="button"
                             onClick={() => setShowPassword(!showPassword)}
                             className="absolute right-3 top-1/2 -translate-y-1/2 text-ui-secondary hover:text-text-primary"
+                            disabled={loading}
                         >
                             {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                         </button>
@@ -153,7 +177,7 @@ const LockOverlay = ({
 
                     <button
                         type="submit"
-                        disabled={loading}
+                        disabled={loading || configError}
                         className="w-full bg-brand-primary text-white font-bold py-3 rounded-lg hover:bg-brand-hover transition-all shadow-warm-lg flex justify-center items-center gap-2 disabled:opacity-70 mt-2"
                     >
                         {loading ? "Creando cuenta..." : submitButtonText}

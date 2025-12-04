@@ -3,6 +3,7 @@ import { Brain, Key, Calendar, MessageCircle, HelpCircle, CheckCircle } from 'lu
 import LockOverlay from './LockOverlay';
 import WaitlistCard from './WaitlistCard';
 import FeedbackModal from '../../components/ui/FeedbackModal';
+import TensionRadar from './TensionRadar';
 import { useAuth } from '../../hooks/useAuth';
 
 const ResultCard = ({ data, intensity }) => {
@@ -49,12 +50,17 @@ const ResultCard = ({ data, intensity }) => {
                 </blockquote>
             </div>
 
-            {/* 2. Hook Text (Siempre visible) */}
+            {/* 2. Radar Chart (Nuevo) */}
+            <div className="mb-8 flex justify-center md:justify-start">
+                <TensionRadar profileId={data.id} intensity={intensity} />
+            </div>
+
+            {/* 3. Hook Text (Siempre visible) */}
             <div className="mb-8 text-body text-text-primary leading-relaxed">
                 {data.content.hook_text}
             </div>
 
-            {/* 3. Contenido Condicional (Ciencia) */}
+            {/* 4. Contenido Condicional (Ciencia) */}
             {isUnlocked && (
                 <div className="mb-8 bg-brand-primary/5 p-6 rounded-2xl border border-brand-primary/20 animate-in fade-in">
                     <h4 className="text-subtitle text-brand-primary mb-2 flex items-center gap-2">
@@ -66,7 +72,7 @@ const ResultCard = ({ data, intensity }) => {
                 </div>
             )}
 
-            {/* 4. Herramienta / Pasos */}
+            {/* 5. Herramienta / Pasos */}
             {isFullyVisible && (
                 <div className="border border-ui-secondary/20 rounded-2xl overflow-hidden mb-8 animate-in fade-in shadow-warm">
                     <div className="bg-bg-primary p-4 border-b border-ui-secondary/20 flex justify-between items-center">
@@ -96,7 +102,7 @@ const ResultCard = ({ data, intensity }) => {
                 </div>
             )}
 
-            {/* 5. Bloqueo (Si no está desbloqueado) */}
+            {/* 6. Bloqueo (Si no está desbloqueado) */}
             {!isUnlocked && (
                 <LockOverlay
                     intensity={intensity}
@@ -106,7 +112,7 @@ const ResultCard = ({ data, intensity }) => {
                 />
             )}
 
-            {/* 6. Acciones Post-Desbloqueo */}
+            {/* 7. Acciones Post-Desbloqueo */}
             {isUnlocked && (
                 <div className="mt-12 flex flex-col items-center gap-6 animate-in fade-in slide-in-from-bottom-8">
                     <button
@@ -135,7 +141,7 @@ const ResultCard = ({ data, intensity }) => {
                 </div>
             )}
 
-            {/* 7. Catch-All Feedback Button (Footer) */}
+            {/* 8. Catch-All Feedback Button (Footer) */}
             <div className="mt-8 pt-6 border-t border-ui-secondary/20 text-center">
                 <button
                     onClick={() => setShowFeedbackModal(true)}

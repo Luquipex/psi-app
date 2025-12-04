@@ -1,13 +1,16 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { INTERVENTIONS } from '../data/interventions';
 import Layout from '../components/layout/Layout';
-import { Zap, Calendar, Trophy, Lock } from 'lucide-react';
+import { Zap, Calendar, Trophy, Lock, ChevronDown, ChevronUp } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import SuperpowerModal from '../components/ui/SuperpowerModal';
 
 const DashboardPage = () => {
-    const { user, userProfile, logout } = useAuth();
+    const { user, userProfile, logout, loading } = useAuth();
     const navigate = useNavigate();
+    const [showSuperpowerModal, setShowSuperpowerModal] = useState(false);
+    const [toolExpanded, setToolExpanded] = useState(false);
 
     const handleLogout = async () => {
         await logout();
@@ -18,11 +21,14 @@ const DashboardPage = () => {
     const archetypeId = userProfile?.archetypeId;
     const archetypeData = archetypeId ? INTERVENTIONS[archetypeId] : null;
 
-    if (!user) {
+    if (!user || loading) {
         return (
             <Layout>
                 <div className="p-6 text-center">
-                    <p>Cargando sesión...</p>
+                    <div className="animate-pulse space-y-4">
+                        <div className="h-8 bg-ui-secondary/20 rounded w-1/3 mx-auto"></div>
+                        <div className="h-4 bg-ui-secondary/20 rounded w-1/4 mx-auto"></div>
+                    </div>
                 </div>
             </Layout>
         );
@@ -67,9 +73,15 @@ const DashboardPage = () => {
                             <h4 className="font-bold text-text-primary text-sm mb-1">
                                 Tu Superpoder Oculto:
                             </h4>
-                            <p className="text-sm text-text-secondary">
+                            <p className="text-sm text-text-secondary mb-2">
                                 {archetypeData.content.science_explanation.substring(0, 120)}...
                             </p>
+                            <button
+                                onClick={() => setShowSuperpowerModal(true)}
+                                className="text-xs font-bold text-brand-primary hover:underline"
+                            >
+                                Ver más
+                            </button>
                         </div>
                     </div>
                 ) : (
@@ -106,12 +118,40 @@ const DashboardPage = () => {
                                 <h3 className="text-2xl font-bold mb-2">
                                     {archetypeData.content.intervention.tool_name}
                                 </h3>
-                                <p className="text-white/80 mb-6 text-sm max-w-lg">
-                                    {archetypeData.content.intervention.steps[0]}
+                                <p className="text-white/80 mb-4 text-sm max-w-lg">
+                                    {archetypeData.content.intervention.description}
                                 </p>
-                                <button className="bg-white text-text-primary font-bold py-3 px-6 rounded-xl w-full md:w-auto hover:bg-brand-primary hover:text-white transition-colors">
-                                    Comenzar Práctica
+                                <button
+                                    onClick={() => setToolExpanded(!toolExpanded)}
+                                    className="bg-white text-text-primary font-bold py-3 px-6 rounded-xl w-full md:w-auto hover:bg-brand-primary hover:text-white transition-colors flex items-center justify-center gap-2"
+                                >
+                                    {toolExpanded ? 'Ocultar detalles' : 'Ver cómo funciona'}
+                                    {toolExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
                                 </button>
+
+                                {toolExpanded && (
+                                    <div className="mt-6 bg-white/10 backdrop-blur-sm rounded-xl p-4 animate-in slide-in-from-top duration-300">
+                                        <h4 className="font-bold mb-3 text-white">Pasos a seguir:</h4>
+                                        <ol className="space-y-2 text-sm text-white/90">
+                                            {archetypeData.content.intervention.steps.map((step, index) => (
+                                                <li key={index} className="flex gap-2">
+                                                    <span className="font-bold text-brand-primary bg-white/20 rounded-full w-6 h-6 flex items-center justify-center flex-shrink-0">
+                                                        {index + 1}
+                                                    </span>
+                                                    <span className="flex-1">{step}</span>
+                                                </li>
+                                            ))}
+                                        </ol>
+                                        {archetypeData.content.intervention.evidence && (
+                                            <div className="mt-4 pt-4 border-t border-white/20">
+                                                <p className="text-xs text-white/70 italic">
+                                                    📊 {archetypeData.content.intervention.evidence}
+                                                </p>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+
                             </div>
                         </div>
                     ) : (
@@ -146,6 +186,16 @@ const DashboardPage = () => {
                         </div>
                     </div>
                 </div>
+
+                {/* Modal for Superpoder */}
+                {archetypeData && (
+                    <SuperpowerModal
+                        isOpen={showSuperpowerModal}
+                        onClose={() => setShowSuperpowerModal(false)}
+                        content={archetypeData.content.science_explanation}
+                    />
+                )}
+
             </div>
         </Layout>
     );

@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { DiagnosticProvider } from './hooks/useDiagnostic';
 import { AuthProvider } from './hooks/useAuth';
+import AdBlockerDetector from './components/ui/AdBlockerDetector';
 import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
@@ -13,6 +14,7 @@ function App() {
         <Router>
             <AuthProvider>
                 <DiagnosticProvider>
+                    <AdBlockerDetector />
                     <Routes>
                         <Route path="/" element={<LandingPage />} />
                         <Route path="/login" element={<LoginPage />} />

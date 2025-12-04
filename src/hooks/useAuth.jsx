@@ -116,10 +116,6 @@ export const AuthProvider = ({ children }) => {
             }
         }
 
-        // CRÍTICO: Actualizar el estado user inmediatamente para no depender de onAuthStateChanged
-        setUser(newUser);
-        setLoading(false);
-
         return newUser;
     };
 
@@ -162,7 +158,7 @@ export const AuthProvider = ({ children }) => {
 
     return (
         <AuthContext.Provider value={value}>
-            {children}
+            {!loading && children}
         </AuthContext.Provider>
     );
 };

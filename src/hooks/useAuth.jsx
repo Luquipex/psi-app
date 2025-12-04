@@ -15,6 +15,18 @@ export const AuthProvider = ({ children }) => {
     const [userProfile, setUserProfile] = useState(null);
     const [loading, setLoading] = useState(true);
 
+    // Cargar perfil desde localStorage al inicio (cache optimista)
+    useEffect(() => {
+        const cachedProfile = localStorage.getItem('psi_user_profile');
+        if (cachedProfile) {
+            try {
+                setUserProfile(JSON.parse(cachedProfile));
+            } catch (error) {
+                console.error('Error parsing cached profile:', error);
+            }
+        }
+    }, []);
+
     // Escuchar cambios en la sesión
     useEffect(() => {
         if (!auth) {
@@ -45,9 +57,13 @@ export const AuthProvider = ({ children }) => {
                         const docSnap = await Promise.race([firestoreRead, timeout]);
 
                         if (docSnap.exists()) {
-                            setUserProfile(docSnap.data());
+                            const profileData = docSnap.data();
+                            setUserProfile(profileData);
+                            // Actualizar cache
+                            localStorage.setItem('psi_user_profile', JSON.stringify(profileData));
                         } else {
                             console.warn("User profile document does not exist yet");
+                            // Mantener el perfil del cache si existe
                         }
                     } catch (error) {
                         console.error("Error fetching user profile:", error);
@@ -57,6 +73,8 @@ export const AuthProvider = ({ children }) => {
             } else {
                 setUserProfile(null);
                 setLoading(false);
+                // Limpiar cache al hacer logout
+                localStorage.removeItem('psi_user_profile');
             }
         });
 
@@ -87,7 +105,10 @@ export const AuthProvider = ({ children }) => {
                 await Promise.race([firestoreWrite, timeout]);
 
                 // Actualizar estado local solo si la escritura fue exitosa
-                setUserProfile({ email: newUser.email, ...additionalData });
+                const profileData = { email: newUser.email, ...additionalData };
+                setUserProfile(profileData);
+                // Guardar en localStorage para acceso inmediato
+                localStorage.setItem('psi_user_profile', JSON.stringify(profileData));
             } catch (error) {
                 console.error("Error creating user profile:", error);
                 // No bloqueamos el flujo si falla Firestore

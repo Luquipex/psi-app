@@ -29,12 +29,26 @@ if (isConfigValid) {
     try {
         app = initializeApp(firebaseConfig);
         auth = getAuth(app);
+
+        // Inicializar Firestore con configuración específica
         db = getFirestore(app);
+
+        console.log("✅ Firebase initialized successfully");
+        console.log("Auth:", auth ? "OK" : "FAIL");
+        console.log("Firestore:", db ? "OK" : "FAIL");
     } catch (error) {
-        console.error("Firebase initialization error:", error);
+        console.error("❌ Firebase initialization error:", error);
     }
 } else {
-    console.warn("Firebase config missing. Features requiring database will be disabled.");
+    console.warn("⚠️ Firebase config missing. Features requiring database will be disabled.");
+    console.log("Config check:", {
+        apiKey: !!import.meta.env.VITE_FIREBASE_API_KEY,
+        authDomain: !!import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+        projectId: !!import.meta.env.VITE_FIREBASE_PROJECT_ID,
+        storageBucket: !!import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+        messagingSenderId: !!import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+        appId: !!import.meta.env.VITE_FIREBASE_APP_ID
+    });
 }
 
 export {
